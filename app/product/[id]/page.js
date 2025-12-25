@@ -1,7 +1,8 @@
 "use client";
-import { products } from "../../data/products";
+import { products } from "../../data/products"; // Path check karlena (app/data/products)
 import Script from "next/script";
 import { use, useState } from "react";
+import { CheckCircle, ShieldCheck } from "lucide-react"; // Icons import
 
 export default function ProductPage({ params }) {
   const unwrappedParams = use(params);
@@ -27,15 +28,13 @@ export default function ProductPage({ params }) {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: data.amount,
         currency: "INR",
-        name: "My Digital Store",
+        name: "CraftedPixl Store",
         description: product.title,
         order_id: data.id,
         handler: function (response) {
-          alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-          // REPLACE THIS LINK with your Google Drive Link later
-          window.location.href = "https://drive.google.com/"; 
+          window.location.href = product.downloadLink; 
         },
-        theme: { color: "#3399cc" }
+        theme: { color: "#9333ea" } // Purple theme for razorpay
       };
 
       const rzp1 = new window.Razorpay(options);
@@ -48,27 +47,55 @@ export default function ProductPage({ params }) {
     }
   };
 
-  if (!product) return <div>Product not found</div>;
+  if (!product) return <div className="text-white text-center mt-20">Product not found</div>;
 
   return (
-    <div className="min-h-screen bg-white p-10 flex justify-center items-center">
+    <div className="min-h-screen bg-[#050505] text-white flex justify-center items-center p-4">
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
-
-      <div className="max-w-4xl w-full grid grid-cols-1 md:grid-cols-2 gap-10 border p-6 rounded-lg shadow-lg">
-        <img src={product.image} className="w-full rounded-lg" />
-
+      
+      <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-12">
+        {/* Left: Image */}
+        <div className="relative">
+          <div className="absolute inset-0 bg-purple-600 blur-[50px] opacity-20"></div>
+          <img src={product.image} className="relative w-full rounded-2xl border border-gray-800 shadow-2xl z-10" />
+        </div>
+        
+        {/* Right: Details */}
         <div className="flex flex-col justify-center">
-          <h1 className="text-3xl font-bold text-black">{product.title}</h1>
-          <p className="text-gray-600 mt-4">{product.description}</p>
-          <div className="text-3xl font-bold text-green-600 mt-6">₹{product.price}</div>
+          <span className="text-purple-400 font-bold tracking-wide uppercase text-sm mb-2">Instant Download</span>
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4">{product.title}</h1>
+          <p className="text-gray-400 text-lg mb-6">{product.description}</p>
+          
+          <div className="flex items-center gap-4 mb-8">
+            <span className="text-4xl font-bold text-white">₹{product.price}</span>
+            <span className="text-xl text-gray-600 line-through">₹{product.originalPrice}</span>
+            <span className="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-sm font-bold">
+              80% OFF
+            </span>
+          </div>
 
           <button 
             onClick={handlePayment}
             disabled={loading}
-            className="mt-8 bg-black text-white text-xl px-10 py-4 rounded-lg hover:bg-gray-800 w-full disabled:bg-gray-400"
+            className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-xl font-bold py-4 px-8 rounded-xl shadow-lg shadow-purple-900/30 transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Processing..." : "Buy Now"}
+            {loading ? "Processing..." : "Get Instant Access Now"}
           </button>
+
+          <div className="mt-8 space-y-3 text-gray-400">
+            <div className="flex items-center gap-2">
+              <CheckCircle size={20} className="text-purple-500" />
+              <span>Lifetime access to files</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle size={20} className="text-purple-500" />
+              <span>No watermark & High Quality</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={20} className="text-purple-500" />
+              <span>Secure Payment via Razorpay</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
